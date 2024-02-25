@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 
 router.post("/password-reset-link", async (req, res) => {
   const { email } = req.body;
-  console.log(email);
+
   // todo: write your code here
   // 1. verify if email is in database
   const user = await prisma.user.findUnique({
@@ -77,9 +77,12 @@ router.post("/password-reset/confirm", async (req, res) => {
   const { token, password } = req.body;
   try {
     // 1. Find the user by the token
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: {
         resetToken: token,
+        resetTokenExpiry: {
+          gt: Date.now(),
+        },
       },
     });
 
